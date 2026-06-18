@@ -8,8 +8,7 @@ final class TokenService
 {
     public function __construct(
         private readonly FormProtectionFactory $formProtectionFactory
-    ) {
-    }
+    ) {}
 
     public function beToken(string $context): string
     {

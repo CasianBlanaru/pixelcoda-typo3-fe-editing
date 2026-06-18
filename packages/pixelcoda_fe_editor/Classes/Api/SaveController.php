@@ -65,7 +65,7 @@ final class SaveController
                 if (!$beUser->isAdmin() && !$beUser->check('tables_modify', $table)) {
                     return new JsonResponse(['error' => 'no_modify_permission'], 403);
                 }
-                $cmd[$table][(int)$uid] = ['delete' => 1];
+                $cmd[$table][(int) $uid] = ['delete' => 1];
             } elseif ($action === 'move' && $table !== '' && $uid !== '' && $target !== '') {
                 if (!array_key_exists($table, $allowedTables)) {
                     return new JsonResponse(['error' => 'table_not_allowed'], 400);
@@ -73,12 +73,12 @@ final class SaveController
                 if (!$beUser->isAdmin() && !$beUser->check('tables_modify', $table)) {
                     return new JsonResponse(['error' => 'no_modify_permission'], 403);
                 }
-                $cmd[$table][(int)$uid] = ['move' => (int)$target];
+                $cmd[$table][(int) $uid] = ['move' => (int) $target];
             } elseif ($table !== '' && $field !== '') {
                 if (!array_key_exists($table, $allowedTables) || !in_array($field, $allowedTables[$table], true)) {
                     return new JsonResponse(['error' => 'field_not_allowed'], 400);
                 }
-                if (!ctype_digit($uid) || (int)$uid <= 0) {
+                if (!ctype_digit($uid) || (int) $uid <= 0) {
                     return new JsonResponse(['error' => 'invalid_uid'], 400);
                 }
                 if (!$beUser->isAdmin() && !$beUser->check('tables_modify', $table)) {
@@ -86,7 +86,7 @@ final class SaveController
                 }
 
                 /** @var array<string, mixed> $record */
-                $record = BackendUtility::getRecord($table, (int)$uid) ?: [];
+                $record = BackendUtility::getRecord($table, (int) $uid) ?: [];
                 if ($record === []) {
                     return new JsonResponse(['error' => 'record_not_found'], 404);
                 }
@@ -95,11 +95,11 @@ final class SaveController
                     $affectedPageIds[$recordPid] = true;
                 }
 
-                $beforeSaveEvent = new BeforeSaveEvent($table, $field, $value, (int)$uid, $record);
+                $beforeSaveEvent = new BeforeSaveEvent($table, $field, $value, (int) $uid, $record);
                 GeneralUtility::makeInstance(EventDispatcher::class)->dispatch($beforeSaveEvent);
 
                 $finalValue = $beforeSaveEvent->getContent();
-                $data[$table][(int)$uid] = [$field => $finalValue];
+                $data[$table][(int) $uid] = [$field => $finalValue];
             }
 
             if ($rawData !== '') {
@@ -126,8 +126,8 @@ final class SaveController
                             if ($payloadPid > 0) {
                                 $affectedPageIds[$payloadPid] = true;
                             }
-                            if (ctype_digit((string)$id)) {
-                                $payloadRecord = BackendUtility::getRecord((string)$t, (int)$id, 'pid') ?: [];
+                            if (ctype_digit((string) $id)) {
+                                $payloadRecord = BackendUtility::getRecord((string) $t, (int) $id, 'pid') ?: [];
                                 $existingPid = $this->intValue($payloadRecord['pid'] ?? 0);
                                 if ($existingPid > 0) {
                                     $affectedPageIds[$existingPid] = true;
@@ -178,12 +178,12 @@ final class SaveController
                     'ok' => false,
                     'error' => 'datahandler_errors',
                     'errors' => $dh->errorLog,
-                    'message' => 'DataHandler processing failed'
+                    'message' => 'DataHandler processing failed',
                 ], 400);
             }
 
             if ($table !== '' && $field !== '' && $finalValue !== null) {
-                $afterSaveEvent = new AfterSaveEvent($table, $field, $finalValue, (int)$uid, $record, true);
+                $afterSaveEvent = new AfterSaveEvent($table, $field, $finalValue, (int) $uid, $record, true);
                 GeneralUtility::makeInstance(EventDispatcher::class)->dispatch($afterSaveEvent);
             }
 
@@ -191,7 +191,7 @@ final class SaveController
             if ($affectedPageIds !== []) {
                 GeneralUtility::makeInstance(CacheManager::class)->flushCachesInGroupByTags(
                     'pages',
-                    array_map(static fn (int $pageId): string => 'pageId_' . $pageId, $affectedPageIds)
+                    array_map(static fn(int $pageId): string => 'pageId_' . $pageId, $affectedPageIds)
                 );
             }
 
@@ -206,18 +206,18 @@ final class SaveController
             return new JsonResponse([
                 'ok' => false,
                 'error' => 'exception',
-                'message' => 'An error occurred: ' . $e->getMessage()
+                'message' => 'An error occurred: ' . $e->getMessage(),
             ], 500);
         }
     }
 
     private function stringValue(mixed $value): string
     {
-        return is_scalar($value) ? (string)$value : '';
+        return is_scalar($value) ? (string) $value : '';
     }
 
     private function intValue(mixed $value): int
     {
-        return is_numeric($value) ? (int)$value : 0;
+        return is_numeric($value) ? (int) $value : 0;
     }
 }

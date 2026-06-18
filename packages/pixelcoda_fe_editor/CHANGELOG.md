@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.3.0 - 2026-06-06
+
+- Added TYPO3 Headless compatibility with a dedicated metadata layer (`_pixelcoda`).
+- Added Next.js integration support via explicit `data-pixelcoda-*` attributes.
+- Implemented `PixelCodaHeadlessDataProcessor` to inject editing metadata into JSON output.
+- Added support for `b13/container` metadata (parent, allowed positions).
+- Added native responsive column fields (mobile, tablet, desktop) to `tt_content`.
+- Added custom backend route `record_edit_contextual` for deep-linking from decoupled frontends.
+- Added feature flags to control metadata exposure and security.
+- Improved `editor.js` to automatically detect headless markers.
+
 ## 1.2.4 - 2026-06-05
 
 - Fixed drag-and-drop persistence for content elements with identical titles or text.

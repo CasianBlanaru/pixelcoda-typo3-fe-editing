@@ -1,3 +1,6 @@
+# Register PixelCoda Headless DataProcessor for all content elements
+tt_content.stdWrap.dataProcessing.159 = PixelCoda\FeEditor\DataProcessing\PixelCodaHeadlessDataProcessor
+
 tt_content.pc_demo = COA
 tt_content.pc_demo {
   10 = TEXT

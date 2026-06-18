@@ -73,6 +73,19 @@
         }
 
         function markContentFields() {
+            // Headless/Next.js support: mark elements with explicit data-pixelcoda attributes
+            document.querySelectorAll("[data-pixelcoda-uid]").forEach(el => {
+                const uid = el.dataset.pixelcodaUid;
+                markFrame(el, uid);
+                const header = el.querySelector("h1, h2, h3, h4, h5, h6");
+                if (header && !header.dataset.pcField) {
+                    markField(header, uid, "header");
+                }
+                const body = el.querySelector("p, .bodytext");
+                if (body && !body.dataset.pcField && body !== header) {
+                    markField(body, uid, "bodytext");
+                }
+            });
             document.querySelectorAll('[id^="c"], [data-content-element-uid], [data-table="tt_content"][data-uid], .frame[data-uid]').forEach(frame => {
                 const uid = parseInt(
                     frame.dataset.contentElementUid
@@ -163,6 +176,7 @@
         }
 
         function markFrame(frame, uid) {
+            const isHeadless = !!frame.dataset.pixelcodaUid;
             if (frame.closest('.pc-fe-toolbar')) return;
             if (frame.dataset.pcRecordUid && frame.dataset.pcRecordUid !== String(uid)) return;
             frame.dataset.pcRecordUid = String(uid);
@@ -187,14 +201,14 @@
             frame.prepend(controls);
             controls.querySelector('.pc-fe-drag-handle').draggable = editMode;
             const record = getRecordByUid(uid);
-            controls.querySelector('.pc-fe-actions-meta strong').textContent = record?.header || record?.CType || 'Inhaltselement';
-            controls.querySelector('.pc-fe-actions-meta span').textContent = (record?.CType || 'tt_content') + ' · UID ' + uid;
+            const ctype = frame.dataset.pixelcodaCtype || record?.CType || 'tt_content';
+            controls.querySelector(".pc-fe-actions-meta strong").textContent = record?.header || frame.dataset.pixelcodaCtype || record?.CType || "Inhaltselement";
+            controls.querySelector('.pc-fe-actions-meta span').textContent = (isHeadless ? 'Headless · ' : '') + ctype + ' · UID ' + uid;
         }
 
         function getIcon(name) {
             return TYPO3 && TYPO3.settings && TYPO3.settings.feEditorIcons
                 ? (TYPO3.settings.feEditorIcons[name] || '')
-                : '';
         }
 
         function getRecordByUid(uid) {
@@ -263,12 +277,16 @@
         }
 
         async function runRecordAction(frame, action, trigger) {
+            const explicitEditUrl = frame?.dataset.pixelcodaEditUrl;
             const uid = frame?.dataset.pcRecordUid;
             const record = getRecordByUid(uid);
             if (!uid) return;
 
-            if (action === 'edit' && record?.editUrl) {
-                openDrawer('record', trigger, record.editUrl);
+            if (action === 'edit') {
+                const url = explicitEditUrl || record?.editUrl;
+                if (url) {
+                    openDrawer('record', trigger, url);
+                }
                 return;
             }
             if (action === 'hide') {
