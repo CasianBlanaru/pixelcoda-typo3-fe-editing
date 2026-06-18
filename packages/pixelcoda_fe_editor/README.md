@@ -108,9 +108,81 @@ POST /typo3/ajax/fe-editor/save
 POST /typo3/ajax/fe-editor/ai
 ```
 
-### Headless Metadata
+### Headless & Next.js Integration
 
-The editor injects a structured JSON object (`window.TYPO3.settings.feEditorMetadata`) describing the page's editable structure, enabling better integration for decoupled or headless TYPO3 frontends.
+Pixelcoda FE Editor provides a dedicated DataProcessor to inject visual editing metadata into your JSON output (e.g., when using `typo3-headless/headless`).
+
+#### 1. Enable Metadata in TYPO3
+
+The metadata layer is automatically registered for all content elements via TypoScript. You can control its behavior in the Extension Configuration:
+
+- **Enable Metadata:** Toggle `headless.enabled`.
+- **Sensitive Information:** Toggle `headless.exposeSensitive` to include/exclude PID, language, and workspace IDs.
+
+#### 2. Metadata Schema
+
+Each content element will include a `_pixelcoda` key:
+
+```json
+{
+  "_pixelcoda": {
+    "uid": 123,
+    "ctype": "textmedia",
+    "backendEditUrl": "https://typo3-inst.localhost/typo3/record/edit?...",
+    "container": true,
+    "containerType": "2col",
+    "allowedColPos": [0, 1],
+    "responsive": {
+      "mobile": 1,
+      "tablet": 2,
+      "desktop": 4
+    }
+  }
+}
+```
+
+#### 3. Frontend Implementation (Next.js)
+
+To enable visual editing in your Next.js frontend, add the corresponding data attributes to your React components:
+
+```jsx
+<section
+  data-pixelcoda-uid={content._pixelcoda?.uid}
+  data-pixelcoda-ctype={content._pixelcoda?.ctype}
+  data-pixelcoda-edit-url={content._pixelcoda?.backendEditUrl}
+>
+  {/* Your content */}
+</section>
+```
+
+Include `EXT:pixelcoda_fe_editor/Resources/Public/editor.js` and `editor.css` in your frontend application to activate the editing overlays.
+
+#### 4. Disabling in Production
+
+It is highly recommended to disable the metadata layer in production if you don't need frontend editing there. You can do this in your sitepackage TypoScript:
+
+```typoscript
+[getTSFE().id > 0 && env("TYPO3_CONTEXT") == "Production"]
+  tt_content.stdWrap.dataProcessing.159 >
+[END]
+```
+
+Or globally via Extension Configuration:
+
+```php
+$GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['pixelcoda_fe_editor']['headless']['enabled'] = 0;
+```
+
+### Known Limitations
+
+- **Cross-Origin Requests:** If your Next.js frontend is on a different domain, ensure that your TYPO3 instance sends appropriate CORS headers.
+- **Backend URL session:** The `backendEditUrl` requires an active TYPO3 backend session.
+- **Container depth:** Deeply nested containers might require manual layout adjustments in the frontend.
+
+### Upgrade Notes (v1.2.x -> v1.3.0)
+
+- **Database Changes:** Run `./vendor/bin/typo3 extension:setup` to add the new responsive column fields.
+- **TypoScript:** The `PixelCodaHeadlessDataProcessor` is now registered automatically. If you have custom DataProcessors on `stdWrap.dataProcessing.159`, please check for conflicts.
 
 ## Editing Text
 

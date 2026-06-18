@@ -21,8 +21,7 @@ final class FrontendEditOverlay implements MiddlewareInterface
         private readonly FormProtectionFactory $formProtectionFactory,
         private readonly UriBuilder $uriBuilder,
         private readonly AiConfiguration $aiConfiguration
-    ) {
-    }
+    ) {}
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
@@ -37,7 +36,7 @@ final class FrontendEditOverlay implements MiddlewareInterface
             return $response;
         }
 
-        $body = (string)$response->getBody();
+        $body = (string) $response->getBody();
         if (!str_contains(strtolower($body), '</body>')) {
             return $response;
         }
@@ -45,8 +44,8 @@ final class FrontendEditOverlay implements MiddlewareInterface
         $csrfToken = $this->formProtectionFactory
             ->createForType('backend')
             ->generateToken('pixelcoda-fe-editor', 'fe-editor-action');
-        $ajaxUrl = (string)$this->uriBuilder->buildUriFromRoute('ajax_fe_editor_save');
-        $aiUrl = (string)$this->uriBuilder->buildUriFromRoute('ajax_fe_editor_ai');
+        $ajaxUrl = (string) $this->uriBuilder->buildUriFromRoute('ajax_fe_editor_save');
+        $aiUrl = (string) $this->uriBuilder->buildUriFromRoute('ajax_fe_editor_ai');
         $pageId = $this->getPageId($request);
         $records = $this->getEditableContentRecords($pageId);
         $body = str_ireplace('</body>', $this->buildInjectionCode($csrfToken, $ajaxUrl, $aiUrl, $pageId, $records) . '</body>', $body);
@@ -54,7 +53,7 @@ final class FrontendEditOverlay implements MiddlewareInterface
         $response->getBody()->rewind();
         $response->getBody()->write($body);
 
-        return $response->withHeader('Content-Length', (string)strlen($body));
+        return $response->withHeader('Content-Length', (string) strlen($body));
     }
 
     private function isEditableFrontendRequest(ServerRequestInterface $request): bool
@@ -114,68 +113,68 @@ final class FrontendEditOverlay implements MiddlewareInterface
         $encodedMetadata = json_encode($metadata, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
 
         return <<<HTML
-<link rel="stylesheet" href="{$cssPath}">
-<div id="pc-fe-toolbar-root" class="pc-fe-toolbar" role="toolbar" aria-label="Frontend Editing">
-  <div class="pc-fe-toolbar-actions">
-    <button id="pc-edit-toggle" class="pc-fe-button" type="button" data-label="Frontend Editing aktivieren" aria-label="Frontend Editing aktivieren" aria-pressed="false"><img class="pc-fe-icon" src="{$editIconHtmlPath}" alt="" onerror="this.hidden=true"><span>Edit</span></button>
-    <button id="pc-save" class="pc-fe-button pc-fe-save" type="button" data-label="Änderungen speichern" aria-label="Änderungen speichern" disabled><img class="pc-fe-icon" src="{$editIconHtmlPath}" alt="" onerror="this.hidden=true"><span>Save</span></button>
-    <button id="pc-discard" class="pc-fe-button pc-fe-discard" type="button" data-label="Änderungen verwerfen" aria-label="Änderungen verwerfen" disabled><span>Discard</span></button>
-    <span class="pc-fe-toolbar-divider" aria-hidden="true"></span>
-    <button id="pc-ai" class="pc-fe-button pc-fe-ai" type="button" data-label="AI-Schreibassistent öffnen" aria-label="AI-Schreibassistent öffnen"><img class="pc-fe-icon" src="{$aiIconHtmlPath}" alt="" onerror="this.hidden=true"><span>AI</span></button>
-    <button id="pc-add-global" class="pc-fe-button pc-fe-icon-button" type="button" data-label="Neues Element hinzufügen" aria-label="Neues Element hinzufügen"><img class="pc-fe-icon" src="{$addIconHtmlPath}" alt="" onerror="this.hidden=true"></button>
-  </div>
-  <div class="pc-fe-toolbar-feedback">
-    <span id="pc-fe-selection" class="pc-fe-selection">Editieren aktivieren</span>
-    <span id="pc-fe-status" class="pc-fe-status" aria-live="polite" aria-atomic="true"></span>
-  </div>
-</div>
-<div id="pc-fe-drawer-backdrop" class="pc-fe-drawer-backdrop" hidden></div>
-<aside id="pc-fe-drawer" class="pc-fe-drawer" role="dialog" aria-modal="true" aria-labelledby="pc-fe-drawer-title" hidden>
-  <header class="pc-fe-drawer-header">
-    <div>
-      <span class="pc-fe-drawer-kicker">Pixelcoda FE Editor</span>
-      <h2 id="pc-fe-drawer-title" class="pc-fe-drawer-title">Bearbeiten</h2>
-    </div>
-    <button id="pc-fe-drawer-close" class="pc-fe-drawer-close" type="button" aria-label="Seitenleiste schliessen" title="Schliessen">×</button>
-  </header>
-  <div id="pc-fe-image-panel" class="pc-fe-drawer-panel" hidden>
-    <p class="pc-fe-drawer-hint">Der TYPO3-Datensatz bleibt auf dieser Seite geöffnet. Nach dem Speichern wird die Vorschau automatisch aktualisiert.</p>
-    <iframe id="pc-fe-record-frame" class="pc-fe-record-frame" title="TYPO3 Datensatz bearbeiten"></iframe>
-  </div>
-  <div id="pc-fe-ai-panel" class="pc-fe-drawer-panel pc-fe-ai-panel" hidden>
-    <div id="pc-fe-ai-config" class="pc-fe-ai-config" role="status"></div>
-    <p class="pc-fe-drawer-hint">Verbessert nur das aktuell ausgewählte Textfeld. Der Vorschlag wird vor dem Speichern im Inhalt angezeigt.</p>
-    <fieldset class="pc-fe-ai-actions">
-      <legend>AI-Aktion</legend>
-      <button type="button" class="pc-fe-ai-action active" data-pc-ai-action="rewrite" aria-pressed="true">Verbessern</button>
-      <button type="button" class="pc-fe-ai-action" data-pc-ai-action="shorten" aria-pressed="false">Kürzen</button>
-      <button type="button" class="pc-fe-ai-action" data-pc-ai-action="expand" aria-pressed="false">Erweitern</button>
-    </fieldset>
-    <div class="pc-fe-ai-field">
-      <span>Ausgewähltes Feld</span>
-      <strong id="pc-fe-ai-field-name">Kein Feld ausgewählt</strong>
-    </div>
-    <button id="pc-fe-ai-run" class="pc-fe-drawer-primary" type="button">AI-Vorschlag erstellen</button>
-  </div>
-</aside>
-<script>
-window.TYPO3 = window.TYPO3 || { settings: {}, security: {} };
-window.TYPO3.settings.ajaxUrls = window.TYPO3.settings.ajaxUrls || {};
-window.TYPO3.settings.ajaxUrls['fe_editor_save'] = {$encodedAjaxUrl};
-window.TYPO3.settings.ajaxUrls['fe_editor_ai'] = {$encodedAiUrl};
-window.TYPO3.security.feEditorToken = {$encodedToken};
-window.TYPO3.settings.feEditorPageId = {$encodedPageId};
-window.TYPO3.settings.feEditorRecords = {$encodedRecords};
-window.TYPO3.settings.feEditorIcons = {$encodedIcons};
-window.TYPO3.settings.feEditorAiConfigured = {$encodedAiConfigured};
-window.TYPO3.settings.feEditorAiProvider = {$encodedAiProvider};
-window.TYPO3.settings.feEditorMetadata = {$encodedMetadata};
-window.TYPO3.settings.DateConfiguration = window.TYPO3.settings.DateConfiguration || {
-  formats: { date: 'dd.MM.yyyy', time: 'HH:mm', datetime: 'dd.MM.yyyy HH:mm' }
-};
-</script>
-<script src="{$scriptPath}" defer></script>
-HTML;
+            <link rel="stylesheet" href="{$cssPath}">
+            <div id="pc-fe-toolbar-root" class="pc-fe-toolbar" role="toolbar" aria-label="Frontend Editing">
+              <div class="pc-fe-toolbar-actions">
+                <button id="pc-edit-toggle" class="pc-fe-button" type="button" data-label="Frontend Editing aktivieren" aria-label="Frontend Editing aktivieren" aria-pressed="false"><img class="pc-fe-icon" src="{$editIconHtmlPath}" alt="" onerror="this.hidden=true"><span>Edit</span></button>
+                <button id="pc-save" class="pc-fe-button pc-fe-save" type="button" data-label="Änderungen speichern" aria-label="Änderungen speichern" disabled><img class="pc-fe-icon" src="{$editIconHtmlPath}" alt="" onerror="this.hidden=true"><span>Save</span></button>
+                <button id="pc-discard" class="pc-fe-button pc-fe-discard" type="button" data-label="Änderungen verwerfen" aria-label="Änderungen verwerfen" disabled><span>Discard</span></button>
+                <span class="pc-fe-toolbar-divider" aria-hidden="true"></span>
+                <button id="pc-ai" class="pc-fe-button pc-fe-ai" type="button" data-label="AI-Schreibassistent öffnen" aria-label="AI-Schreibassistent öffnen"><img class="pc-fe-icon" src="{$aiIconHtmlPath}" alt="" onerror="this.hidden=true"><span>AI</span></button>
+                <button id="pc-add-global" class="pc-fe-button pc-fe-icon-button" type="button" data-label="Neues Element hinzufügen" aria-label="Neues Element hinzufügen"><img class="pc-fe-icon" src="{$addIconHtmlPath}" alt="" onerror="this.hidden=true"></button>
+              </div>
+              <div class="pc-fe-toolbar-feedback">
+                <span id="pc-fe-selection" class="pc-fe-selection">Editieren aktivieren</span>
+                <span id="pc-fe-status" class="pc-fe-status" aria-live="polite" aria-atomic="true"></span>
+              </div>
+            </div>
+            <div id="pc-fe-drawer-backdrop" class="pc-fe-drawer-backdrop" hidden></div>
+            <aside id="pc-fe-drawer" class="pc-fe-drawer" role="dialog" aria-modal="true" aria-labelledby="pc-fe-drawer-title" hidden>
+              <header class="pc-fe-drawer-header">
+                <div>
+                  <span class="pc-fe-drawer-kicker">Pixelcoda FE Editor</span>
+                  <h2 id="pc-fe-drawer-title" class="pc-fe-drawer-title">Bearbeiten</h2>
+                </div>
+                <button id="pc-fe-drawer-close" class="pc-fe-drawer-close" type="button" aria-label="Seitenleiste schliessen" title="Schliessen">×</button>
+              </header>
+              <div id="pc-fe-image-panel" class="pc-fe-drawer-panel" hidden>
+                <p class="pc-fe-drawer-hint">Der TYPO3-Datensatz bleibt auf dieser Seite geöffnet. Nach dem Speichern wird die Vorschau automatisch aktualisiert.</p>
+                <iframe id="pc-fe-record-frame" class="pc-fe-record-frame" title="TYPO3 Datensatz bearbeiten"></iframe>
+              </div>
+              <div id="pc-fe-ai-panel" class="pc-fe-drawer-panel pc-fe-ai-panel" hidden>
+                <div id="pc-fe-ai-config" class="pc-fe-ai-config" role="status"></div>
+                <p class="pc-fe-drawer-hint">Verbessert nur das aktuell ausgewählte Textfeld. Der Vorschlag wird vor dem Speichern im Inhalt angezeigt.</p>
+                <fieldset class="pc-fe-ai-actions">
+                  <legend>AI-Aktion</legend>
+                  <button type="button" class="pc-fe-ai-action active" data-pc-ai-action="rewrite" aria-pressed="true">Verbessern</button>
+                  <button type="button" class="pc-fe-ai-action" data-pc-ai-action="shorten" aria-pressed="false">Kürzen</button>
+                  <button type="button" class="pc-fe-ai-action" data-pc-ai-action="expand" aria-pressed="false">Erweitern</button>
+                </fieldset>
+                <div class="pc-fe-ai-field">
+                  <span>Ausgewähltes Feld</span>
+                  <strong id="pc-fe-ai-field-name">Kein Feld ausgewählt</strong>
+                </div>
+                <button id="pc-fe-ai-run" class="pc-fe-drawer-primary" type="button">AI-Vorschlag erstellen</button>
+              </div>
+            </aside>
+            <script>
+            window.TYPO3 = window.TYPO3 || { settings: {}, security: {} };
+            window.TYPO3.settings.ajaxUrls = window.TYPO3.settings.ajaxUrls || {};
+            window.TYPO3.settings.ajaxUrls['fe_editor_save'] = {$encodedAjaxUrl};
+            window.TYPO3.settings.ajaxUrls['fe_editor_ai'] = {$encodedAiUrl};
+            window.TYPO3.security.feEditorToken = {$encodedToken};
+            window.TYPO3.settings.feEditorPageId = {$encodedPageId};
+            window.TYPO3.settings.feEditorRecords = {$encodedRecords};
+            window.TYPO3.settings.feEditorIcons = {$encodedIcons};
+            window.TYPO3.settings.feEditorAiConfigured = {$encodedAiConfigured};
+            window.TYPO3.settings.feEditorAiProvider = {$encodedAiProvider};
+            window.TYPO3.settings.feEditorMetadata = {$encodedMetadata};
+            window.TYPO3.settings.DateConfiguration = window.TYPO3.settings.DateConfiguration || {
+              formats: { date: 'dd.MM.yyyy', time: 'HH:mm', datetime: 'dd.MM.yyyy HH:mm' }
+            };
+            </script>
+            <script src="{$scriptPath}" defer></script>
+            HTML;
     }
 
     private function getAssetWebPath(string $assetPath): string
@@ -228,7 +227,7 @@ HTML;
                 'CType' => $this->stringValue($row['CType'] ?? ''),
                 'header' => trim($this->stringValue($row['header'] ?? '')),
                 'bodytextText' => trim(html_entity_decode(strip_tags($this->stringValue($row['bodytext'] ?? '')), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')),
-                'editUrl' => (string)$this->uriBuilder->buildUriFromRoute('record_edit_contextual', [
+                'editUrl' => (string) $this->uriBuilder->buildUriFromRoute('record_edit_contextual', [
                     'edit' => [
                         'tt_content' => [
                             $uid => 'edit',
@@ -244,11 +243,11 @@ HTML;
 
     private function stringValue(mixed $value): string
     {
-        return is_scalar($value) ? (string)$value : '';
+        return is_scalar($value) ? (string) $value : '';
     }
 
     private function intValue(mixed $value): int
     {
-        return is_numeric($value) ? (int)$value : 0;
+        return is_numeric($value) ? (int) $value : 0;
     }
 }

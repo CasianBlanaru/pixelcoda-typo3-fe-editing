@@ -17,9 +17,7 @@ final class AiController
 {
     private const MAX_INPUT_LENGTH = 6000;
 
-    public function __construct(private readonly AiConfiguration $aiConfiguration)
-    {
-    }
+    public function __construct(private readonly AiConfiguration $aiConfiguration) {}
 
     public function handle(ServerRequestInterface $request): JsonResponse
     {
@@ -84,7 +82,7 @@ final class AiController
             }
 
             $statusCode = $response->getStatusCode();
-            $rawBody = (string)$response->getBody();
+            $rawBody = (string) $response->getBody();
             $decoded = json_decode($rawBody, true);
             if ($statusCode < 200 || $statusCode >= 300 || !is_array($decoded)) {
                 /** @var array<string, mixed>|null $decoded */
@@ -228,6 +226,6 @@ final class AiController
 
     private function stringValue(mixed $value): string
     {
-        return is_scalar($value) ? (string)$value : '';
+        return is_scalar($value) ? (string) $value : '';
     }
 }
