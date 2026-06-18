@@ -134,6 +134,6 @@ class ContentEditableViewHelper extends AbstractTagBasedViewHelper
     private function stringArgument(string $name, string $default = ''): string
     {
         $value = $this->arguments[$name] ?? $default;
-        return is_scalar($value) ? (string)$value : $default;
+        return is_scalar($value) ? (string) $value : $default;
     }
 }

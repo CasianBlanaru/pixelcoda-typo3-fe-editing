@@ -8,9 +8,7 @@ use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 
 final readonly class AiConfiguration
 {
-    public function __construct(private ExtensionConfiguration $extensionConfiguration)
-    {
-    }
+    public function __construct(private ExtensionConfiguration $extensionConfiguration) {}
 
     /**
      * @return array{enabled: bool, provider: string, apiKey: string, model: string, endpoint: string}
@@ -33,7 +31,7 @@ final readonly class AiConfiguration
         }
 
         return [
-            'enabled' => (bool)($ai['enabled'] ?? true),
+            'enabled' => (bool) ($ai['enabled'] ?? true),
             'provider' => $provider,
             'apiKey' => $this->stringValue(getenv('OPENAI_API_KEY') ?: getenv('AI_API_KEY') ?: ($ai['apiKey'] ?? '')),
             'model' => $this->stringValue(getenv('OPENAI_MODEL') ?: getenv('AI_MODEL') ?: ($ai['model'] ?? '') ?: $providers[$provider]['model']),
@@ -43,6 +41,6 @@ final readonly class AiConfiguration
 
     private function stringValue(mixed $value): string
     {
-        return is_scalar($value) ? (string)$value : '';
+        return is_scalar($value) ? (string) $value : '';
     }
 }

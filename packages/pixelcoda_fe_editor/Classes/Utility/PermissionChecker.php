@@ -17,7 +17,7 @@ final class PermissionChecker
         $extensionConfig = is_array($userTsConfig['tx_pixelcodafeeditor.'] ?? null)
             ? $userTsConfig['tx_pixelcodafeeditor.']
             : [];
-        if ((bool)($extensionConfig['disabled'] ?? false)) {
+        if ((bool) ($extensionConfig['disabled'] ?? false)) {
             return false;
         }
         if ($be->isAdmin()) {
