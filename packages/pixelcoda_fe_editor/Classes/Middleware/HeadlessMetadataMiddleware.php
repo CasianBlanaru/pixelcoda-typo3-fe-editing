@@ -109,21 +109,22 @@ class HeadlessMetadataMiddleware implements MiddlewareInterface
             );
         }
 
+        $element['pixelcoda'] = $pixelcoda;
         if (!isset($element['content']) || !is_array($element['content'])) {
             $element['content'] = [];
         }
-        $element['content']['_pixelcoda'] = $pixelcoda;
+        $element['content']['pixelcoda'] = $pixelcoda;
 
         // Recursively process nested elements (e.g. in grid columns)
         foreach ($element as $key => $val) {
-            if ($key !== 'content' && is_array($val)) {
+            if ($key !== 'content' && $key !== 'pixelcoda' && is_array($val)) {
                 $element[$key] = $this->processRecursive($val, $isBeUserLoggedIn);
             }
         }
         if (isset($element['content']) && is_array($element['content'])) {
-             // Don't recurse into _pixelcoda itself
+             // Don't recurse into pixelcoda itself
              foreach ($element['content'] as $k => $v) {
-                 if ($k !== '_pixelcoda' && is_array($v)) {
+                 if ($k !== 'pixelcoda' && is_array($v)) {
                      $element['content'][$k] = $this->processRecursive($v, $isBeUserLoggedIn);
                  }
              }

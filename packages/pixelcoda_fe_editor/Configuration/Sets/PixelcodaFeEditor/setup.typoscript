@@ -102,15 +102,15 @@ lib.pixelcoda_headless_metadata {
     responsive {
       fields {
         mobile = TEXT
-        mobile.field = tx_pixelcodafeeditor_mobile
+        mobile.field = txpixelcodafeeditor_mobile
         mobile.intval = 1
         
         tablet = TEXT
-        tablet.field = tx_pixelcodafeeditor_tablet
+        tablet.field = txpixelcodafeeditor_tablet
         tablet.intval = 1
         
         desktop = TEXT
-        desktop.field = tx_pixelcodafeeditor_desktop
+        desktop.field = txpixelcodafeeditor_desktop
         desktop.intval = 1
       }
     }
