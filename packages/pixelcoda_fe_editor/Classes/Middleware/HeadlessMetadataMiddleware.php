@@ -76,7 +76,7 @@ class HeadlessMetadataMiddleware implements MiddlewareInterface
         $row = $queryBuilder
             ->select('pid', 'CType', 'tx_pixelcodafeeditor_mobile', 'tx_pixelcodafeeditor_tablet', 'tx_pixelcodafeeditor_desktop')
             ->from('tt_content')
-            ->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, ParameterType::INTEGER)))
+            ->where($queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid)))
             ->executeQuery()
             ->fetchAssociative();
 
