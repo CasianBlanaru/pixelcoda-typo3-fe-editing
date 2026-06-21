@@ -1,0 +1,5 @@
+name: pixelcoda/fe-editor
+label: 'PixelCoda FE Editor'
+dependencies:
+  - typo3/fluid-styled-content
+  - friendsoftypo3/headless

@@ -312,7 +312,17 @@ define([
 
           // Ensure all plugins / buttons are loaded
           if (typeof elementData.externalPlugins !== 'undefined') {
-            eval(elementData.externalPlugins);
+            const pluginCalls = elementData.externalPlugins.split(';');
+            pluginCalls.forEach(call => {
+              const match = call.match(/CKEDITOR\.plugins\.addExternal\(['"]([^'"]+)['"],\s*['"]([^'"]+)['"]\)/);
+              if (match && match.length === 3) {
+                const pluginName = match[1];
+                const pluginPath = match[2];
+                CKEDITOR.plugins.addExternal(pluginName, pluginPath);
+              } else if (call.trim() !== '') {
+                log.warn('Could not parse CKEditor external plugin call:', call);
+              }
+            });
           }
 
           var config = {};

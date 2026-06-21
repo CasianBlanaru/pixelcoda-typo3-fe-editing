@@ -54,7 +54,7 @@ class PrepareFieldUpdateEvent
     }
 
     /**
-     * Returns the updated content of the field.
+     * Returns the database record before this update is applied.
      *
      * @return array
      */
@@ -74,7 +74,7 @@ class PrepareFieldUpdateEvent
     }
 
     /**
-     * Returns the updated content of the field.
+     * Returns the database record before this update is applied.
      *
      * @return string
      */
