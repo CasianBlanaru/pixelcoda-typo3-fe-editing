@@ -21,6 +21,11 @@ class HeadlessMetadataMiddleware implements MiddlewareInterface
     {
         $response = $handler->handle($request);
         
+        $settings = $this->getHeadlessSettings();
+        if (!$settings['enabled']) {
+            return $response;
+        }
+
         $contentType = $response->getHeaderLine('Content-Type');
         if (!str_contains($contentType, 'application/json')) {
             return $response;
@@ -47,6 +52,25 @@ class HeadlessMetadataMiddleware implements MiddlewareInterface
 
         // Return the modified response without the old Content-Length (it will be recalculated)
         return $response->withBody($stream)->withoutHeader('Content-Length');
+    }
+
+    protected function getHeadlessSettings(): array
+    {
+        try {
+            $extensionConfiguration = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Configuration\ExtensionConfiguration::class);
+            $config = $extensionConfiguration->get('pixelcoda_fe_editor');
+            return [
+                'enabled' => (bool)($config['headless']['enabled'] ?? true),
+                'exposeBackendEditUrl' => (bool)($config['headless']['exposeBackendEditUrl'] ?? true),
+                'exposePid' => (bool)($config['headless']['exposePid'] ?? false),
+            ];
+        } catch (\Exception) {
+            return [
+                'enabled' => true,
+                'exposeBackendEditUrl' => true,
+                'exposePid' => false,
+            ];
+        }
     }
 
     protected function processRecursive(array $data, bool $isBeUserLoggedIn): array
@@ -101,8 +125,15 @@ class HeadlessMetadataMiddleware implements MiddlewareInterface
             $pixelcoda['containerType'] = $pixelcoda['ctype'];
         }
 
-        if ($isBeUserLoggedIn) {
+        $settings = $this->getHeadlessSettings();
+
+        // Security: Expose pid either when explicitly allowed via exposePid, OR to logged-in backend editors / in Development context
+        if ($settings['exposePid'] || $isBeUserLoggedIn || \TYPO3\CMS\Core\Core\Environment::getContext()->isDevelopment()) {
             $pixelcoda['pid'] = (int)$row['pid'];
+        }
+
+        // Security: Expose backendEditUrl only to logged-in backend editors or in Development context, and if explicitly enabled
+        if ($settings['exposeBackendEditUrl'] && ($isBeUserLoggedIn || \TYPO3\CMS\Core\Core\Environment::getContext()->isDevelopment())) {
             $pixelcoda['backendEditUrl'] = sprintf(
                 '/typo3/record/edit?edit[tt_content][%d]=edit&returnUrl=%%2F',
                 $uid
@@ -121,13 +152,11 @@ class HeadlessMetadataMiddleware implements MiddlewareInterface
                 $element[$key] = $this->processRecursive($val, $isBeUserLoggedIn);
             }
         }
-        if (isset($element['content']) && is_array($element['content'])) {
-             // Don't recurse into _pixelcoda itself
-             foreach ($element['content'] as $k => $v) {
-                 if ($k !== '_pixelcoda' && is_array($v)) {
-                     $element['content'][$k] = $this->processRecursive($v, $isBeUserLoggedIn);
-                 }
-             }
+        // Don't recurse into _pixelcoda itself
+        foreach ($element['content'] as $k => $v) {
+            if ($k !== '_pixelcoda' && is_array($v)) {
+                $element['content'][$k] = $this->processRecursive($v, $isBeUserLoggedIn);
+            }
         }
 
         return $element;

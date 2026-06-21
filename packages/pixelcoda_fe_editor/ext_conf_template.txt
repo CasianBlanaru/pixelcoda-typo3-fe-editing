@@ -10,3 +10,14 @@ ai.apiKey =
 # cat=AI/provider; type=string; label=Model: Leave empty to use the provider default.
 ai.model =
 
+# cat=headless/enable; type=boolean; label=Enable Headless editing metadata injection
+headless.enabled = 1
+
+# cat=headless/backendEditUrl; type=boolean; label=Expose backendEditUrl (only to logged-in BE users)
+headless.exposeBackendEditUrl = 1
+
+# cat=headless/pid; type=boolean; label=Expose page ID (pid) to anonymous users
+headless.exposePid = 0
+
+
+
