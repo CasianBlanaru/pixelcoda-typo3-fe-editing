@@ -11,7 +11,8 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Database\ConnectionPool;
-use TYPO3\CMS\Core\Http\HtmlResponse;
+use TYPO3\CMS\Core\Http\Response;
+use TYPO3\CMS\Core\Http\Stream;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class HeadlessMetadataMiddleware implements MiddlewareInterface
@@ -38,7 +39,14 @@ class HeadlessMetadataMiddleware implements MiddlewareInterface
         $data = $this->processRecursive($data, $isBeUserLoggedIn);
 
         $newBody = json_encode($data, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-        return new HtmlResponse($newBody, $response->getStatusCode(), $response->getHeaders());
+        
+        // Create a new stream for the modified body
+        $stream = new Stream('php://temp', 'rw');
+        $stream->write($newBody);
+        $stream->rewind();
+
+        // Return the modified response without the old Content-Length (it will be recalculated)
+        return $response->withBody($stream)->withoutHeader('Content-Length');
     }
 
     protected function processRecursive(array $data, bool $isBeUserLoggedIn): array
