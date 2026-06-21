@@ -90,66 +90,33 @@ tt_content.pc_demo {
 
 lib.pixelcoda_headless_metadata = JSON
 lib.pixelcoda_headless_metadata {
-  fields {
-    uid = TEXT
-    uid.field = uid
-    uid.intval = 1
-    
-    ctype = TEXT
-    ctype.field = CType
-    
-    responsive = JSON
-    responsive {
-      fields {
-        mobile = TEXT
-        mobile.field = txpixelcodafeeditor_mobile
-        mobile.intval = 1
-        
-        tablet = TEXT
-        tablet.field = txpixelcodafeeditor_tablet
-        tablet.intval = 1
-        
-        desktop = TEXT
-        desktop.field = txpixelcodafeeditor_desktop
-        desktop.intval = 1
-      }
-    }
+  dataProcessing {
+    10 = PixelCoda\FeEditor\DataProcessing\PixelCodaHeadlessDataProcessor
+    10.as = _pixelcoda
   }
 }
 
-[backend.user.isLoggedIn]
-lib.pixelcoda_headless_metadata.fields {
-  pid = TEXT
-  pid.field = pid
-  pid.intval = 1
-  
-  backendEditUrl = TEXT
-  backendEditUrl.dataWrap = /typo3/record/edit?edit[tt_content][{field:uid}]=edit&returnUrl=%2F
-}
-[global]
-
-tt_content.text.fields.content.fields.pixelcoda < lib.pixelcoda_headless_metadata
-tt_content.textpic.fields.content.fields.pixelcoda < lib.pixelcoda_headless_metadata
-tt_content.textmedia.fields.content.fields.pixelcoda < lib.pixelcoda_headless_metadata
-tt_content.image.fields.content.fields.pixelcoda < lib.pixelcoda_headless_metadata
-tt_content.header.fields.content.fields.pixelcoda < lib.pixelcoda_headless_metadata
-tt_content.bullets.fields.content.fields.pixelcoda < lib.pixelcoda_headless_metadata
-tt_content.table.fields.content.fields.pixelcoda < lib.pixelcoda_headless_metadata
-tt_content.uploads.fields.content.fields.pixelcoda < lib.pixelcoda_headless_metadata
-tt_content.menu_abstract.fields.content.fields.pixelcoda < lib.pixelcoda_headless_metadata
-tt_content.menu_categorized_content.fields.content.fields.pixelcoda < lib.pixelcoda_headless_metadata
-tt_content.menu_categorized_pages.fields.content.fields.pixelcoda < lib.pixelcoda_headless_metadata
-tt_content.menu_pages.fields.content.fields.pixelcoda < lib.pixelcoda_headless_metadata
-tt_content.menu_subpages.fields.content.fields.pixelcoda < lib.pixelcoda_headless_metadata
-tt_content.menu_recently_updated.fields.content.fields.pixelcoda < lib.pixelcoda_headless_metadata
-tt_content.menu_related_pages.fields.content.fields.pixelcoda < lib.pixelcoda_headless_metadata
-tt_content.menu_section.fields.content.fields.pixelcoda < lib.pixelcoda_headless_metadata
-tt_content.menu_section_pages.fields.content.fields.pixelcoda < lib.pixelcoda_headless_metadata
-tt_content.menu_sitemap.fields.content.fields.pixelcoda < lib.pixelcoda_headless_metadata
-tt_content.menu_sitemap_dir.fields.content.fields.pixelcoda < lib.pixelcoda_headless_metadata
-tt_content.shortcut.fields.content.fields.pixelcoda < lib.pixelcoda_headless_metadata
-tt_content.list.fields.content.fields.pixelcoda < lib.pixelcoda_headless_metadata
-tt_content.html.fields.content.fields.pixelcoda < lib.pixelcoda_headless_metadata
-tt_content.div.fields.content.fields.pixelcoda < lib.pixelcoda_headless_metadata
-tt_content.pc_demo.fields.content.fields.pixelcoda < lib.pixelcoda_headless_metadata
-THIS IS A SYNTAX ERROR {
+tt_content.text.fields.content.fields._pixelcoda < lib.pixelcoda_headless_metadata
+tt_content.textpic.fields.content.fields._pixelcoda < lib.pixelcoda_headless_metadata
+tt_content.textmedia.fields.content.fields._pixelcoda < lib.pixelcoda_headless_metadata
+tt_content.image.fields.content.fields._pixelcoda < lib.pixelcoda_headless_metadata
+tt_content.header.fields.content.fields._pixelcoda < lib.pixelcoda_headless_metadata
+tt_content.bullets.fields.content.fields._pixelcoda < lib.pixelcoda_headless_metadata
+tt_content.table.fields.content.fields._pixelcoda < lib.pixelcoda_headless_metadata
+tt_content.uploads.fields.content.fields._pixelcoda < lib.pixelcoda_headless_metadata
+tt_content.menu_abstract.fields.content.fields._pixelcoda < lib.pixelcoda_headless_metadata
+tt_content.menu_categorized_content.fields.content.fields._pixelcoda < lib.pixelcoda_headless_metadata
+tt_content.menu_categorized_pages.fields.content.fields._pixelcoda < lib.pixelcoda_headless_metadata
+tt_content.menu_pages.fields.content.fields._pixelcoda < lib.pixelcoda_headless_metadata
+tt_content.menu_subpages.fields.content.fields._pixelcoda < lib.pixelcoda_headless_metadata
+tt_content.menu_recently_updated.fields.content.fields._pixelcoda < lib.pixelcoda_headless_metadata
+tt_content.menu_related_pages.fields.content.fields._pixelcoda < lib.pixelcoda_headless_metadata
+tt_content.menu_section.fields.content.fields._pixelcoda < lib.pixelcoda_headless_metadata
+tt_content.menu_section_pages.fields.content.fields._pixelcoda < lib.pixelcoda_headless_metadata
+tt_content.menu_sitemap.fields.content.fields._pixelcoda < lib.pixelcoda_headless_metadata
+tt_content.menu_sitemap_dir.fields.content.fields._pixelcoda < lib.pixelcoda_headless_metadata
+tt_content.shortcut.fields.content.fields._pixelcoda < lib.pixelcoda_headless_metadata
+tt_content.list.fields.content.fields._pixelcoda < lib.pixelcoda_headless_metadata
+tt_content.html.fields.content.fields._pixelcoda < lib.pixelcoda_headless_metadata
+tt_content.div.fields.content.fields._pixelcoda < lib.pixelcoda_headless_metadata
+tt_content.pc_demo.fields.content.fields._pixelcoda < lib.pixelcoda_headless_metadata
